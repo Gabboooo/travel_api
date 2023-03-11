@@ -9,10 +9,14 @@ const express = require("express")
 const app = express()
 
 app.get('', (req, res)=>{
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
     res.send('go to /places!');
 })
 
 app.get('/places', (req, res)=>{
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
     res.json(places)
 })
 
