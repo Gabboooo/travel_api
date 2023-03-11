@@ -1,5 +1,5 @@
 const fs = require('fs');
-port = 8080;
+port = process.env.port || 8080;
 
 const places = JSON.parse(fs.readFileSync('./places.json'));
 
