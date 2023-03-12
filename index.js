@@ -10,7 +10,6 @@ const app = express()
 
 app.get('', (req, res)=>{
     res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
     res.send('go to /places!');
 })
 
