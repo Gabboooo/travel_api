@@ -24,8 +24,9 @@ app.get('', (req, res)=>{
 
 app.get('/places', (req, res)=>{
     res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.json(places)
+    pool.query('SELECT * from places', (err,result)=>{
+        res.json(result.rows)
+    })
 })
 
 //gets all the users id existing in the database (useless atm)
