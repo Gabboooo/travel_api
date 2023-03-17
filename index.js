@@ -9,6 +9,8 @@ const places = JSON.parse(fs.readFileSync('./places.json'));
 const express = require("express")
 const app = express()
 
+app.use(express.static('public'));
+
 const pool = new Pool({
     user: process.env.PGUSER,
     host: process.env.PGHOST,
@@ -19,7 +21,7 @@ const pool = new Pool({
 
 app.get('', (req, res)=>{
     res.statusCode = 200;
-    res.send('go to /places!');
+    res.sendFile(__dirname + 'index.html')
 })
 
 app.get('/places', (req, res)=>{
