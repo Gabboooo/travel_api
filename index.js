@@ -2,14 +2,20 @@ const dotenv = require('dotenv')
 dotenv.config()
 const fs = require('fs');
 const { Pool } = require('pg')
+const { createHash } = require('crypto');
+
+
 //constants and json
 const port = process.env.PORT || 8080;
 const places = JSON.parse(fs.readFileSync('./places.json'));
 //express
 const express = require("express")
 const app = express()
-
 app.use(express.static('public'));
+
+function hash(string) {
+  return createHash('sha256').update(string).digest('hex');
+}
 
 const pool = new Pool({
     user: process.env.PGUSER,
