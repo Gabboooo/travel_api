@@ -68,11 +68,27 @@ app.post('/history', (req,res)=>{
     const body = req.body;
     pool.query('INSERT INTO history (userid, placeid) VALUES ($1, $2)', [body['userid'], body['placeid']],(err, result)=>{
         if(err){
-            res.status(400).send('Error occured, parameters may be wrong.\nParameters expected: userid, placeid (they have to be valid).\nIf the problem persists then use another API :\)')
+            res.status(400).send('Error occured, parameters may be wrong.\nParameters expected: userid, placeid (they have to be valid).\nIf the problem persists then use another API :\)');
             console.log(err);
         }
-        res.status(201).send('Success')
+        else{
+        res.status(201).send('Success');
         // console.log(result)
+        }
+    })
+})
+
+app.get('/history', (req,res)=>{
+    let userid = req.query.userid;
+    pool.query('SELECT userid, placeid, insertdatetime as resultdate, name as placename, description, price, stars, location, places."imageUrl" FROM history JOIN places ON (history.placeid = places.id) WHERE userid = $1',[userid], (err, result)=>{
+        if(err){
+            res.status(400).send('Error occured, parameter may be wrong.\nParameter expected: userid (it has to be valid).\nIf the problem persists then use another API :\)');
+            console.log(err);
+        }
+        else{
+            res.status(200).send(result.rows);
+            console.log(result.rows);
+        }
     })
 })
 
