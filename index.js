@@ -68,7 +68,7 @@ app.post('/history', (req,res)=>{
     const body = req.body;
     pool.query('INSERT INTO history (userid, placeid) VALUES ($1, $2)', [body['userid'], body['placeid']],(err, result)=>{
         if(err){
-            res.status(400).send('Error occured, parameters may be wrong.\nParameters expected: userid, placeid.\nIf the problem persists then use another API :\)')
+            res.status(400).send('Error occured, parameters may be wrong.\nParameters expected: userid, placeid (they have to be valid).\nIf the problem persists then use another API :\)')
             console.log(err);
         }
         res.status(201).send('Success')
