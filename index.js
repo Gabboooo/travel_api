@@ -80,19 +80,40 @@ app.post('/history', (req,res)=>{
 
 app.get('/history', (req,res)=>{
     let userid = req.query.userid;
-    pool.query('SELECT userid, placeid, insertdatetime as resultdate, name as placename, description, price, stars, location, places."imageUrl" FROM history JOIN places ON (history.placeid = places.id) WHERE userid = $1',[userid], (err, result)=>{
+    pool.query('SELECT userid, placeid, insertdatetime as resultdate, name as placename, description, price, stars, location, places."imageUrl" FROM history JOIN places ON (history.placeid = places.id) WHERE userid = $1 ORDER BY insertdatetime DESC',[userid], (err, result)=>{
         if(err){
             res.status(400).send('Error occured, parameter may be wrong.\nParameter expected: userid (it has to be valid).\nIf the problem persists then use another API :\)');
             console.log(err);
-        }
-        else{
-            res.status(200).send(result.rows);
+        } else {
+            res.status(200).send(result.rows.slice(0, 15));
             console.log(result.rows);
         }
     })
 })
 
 // post favorites
+app.post('/favorites', (req,res)=>{
+    //SELECT placebool FROM favorites WHERE placeid = placeid AND userid = userid
+        //if result.rows.isEmpty
+            //INSERT new tuple
+        //else ALTER tuple
+    const reqbody = req.body
+    pool.query('SELECT is_favorite FROM favorites WHERE userid = $1 AND placeid = $2', [reqbody['userid'], reqbody['placeid'], (err, result) =>{
+        if(err){
+            console.log(err);
+            res.status(400).send('Error select')        
+        }
+        else{
+            console.log(result.rows)
+            if(length(result.rows)==0){
+                console.log('found empty')
+            }
+            else{
+                console.log('not empty')
+            }
+        }
+    }])
+})
 
 
 app.listen(port, () => {
