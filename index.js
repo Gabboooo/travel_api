@@ -92,6 +92,9 @@ app.get('/history', (req,res)=>{
     })
 })
 
+// post favorites
+
+
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
   })
