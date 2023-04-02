@@ -7,6 +7,7 @@ const fs = require('fs');
 const { Pool } = require('pg');
 const { createHash } = require('crypto');
 const express = require("express");
+const { rawListeners } = require('process');
 
 // constants and json
 const port = process.env.PORT || 8080;
@@ -73,7 +74,6 @@ app.post('/history', (req,res)=>{
         }
         else{
         res.status(201).send('Success');
-        // console.log(result)
         }
     })
 })
@@ -88,6 +88,38 @@ app.get('/history', (req,res)=>{
         else{
             res.status(200).send(result.rows);
             console.log(result.rows);
+        }
+    })
+})
+
+// POST FAV
+app.post('/favorites', (req,res) =>{
+    //select userid placeid 
+        //if result.rows.lenght == 0 then insert
+        //else alter row
+    const userid = req.body['userid'];
+    const placeid = req.body['placeid'];
+    const isfav = req.body['isfav'];
+    console.log(userid + '+' + placeid)
+    pool.query('SELECT * FROM favorites WHERE userid = $1 AND placeid = $2', [userid, placeid], (err, result)=>{
+        if(err){console.log(err); res.send('Errore post favorites (SELECT)')}
+        else{
+            if(result.rowCount>0 && !isfav){
+                pool.query('DELETE FROM favorites WHERE userid = $1  AND placeid = $2', [userid, placeid], (err2, result2)=>{
+                    if(err2){console.log(err2); res.send('Errore post favorites (DELETE)')}
+                    else{console.log('successful removal'); res.status(200).send('Fav removed')}
+                })
+            }
+            else if(result.rowCount == 0 && isfav){
+                pool.query('INSERT INTO favorites (userid, placeid) VALUES ($1, $2)', [userid, placeid], (err3, result3)=>{
+                    if(err3){console.log(err3); res.send('Errore post favorites (INSERT), invalid placeid or userid?')}
+                    else{console.log('successful insert'); res.status(200).send('Fav inserted')}
+                })
+            }
+            else{
+                res.status(200).send('OK')
+            }
+
         }
     })
 })
