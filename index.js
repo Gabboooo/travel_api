@@ -80,13 +80,12 @@ app.post('/history', (req,res)=>{
 
 app.get('/history', (req,res)=>{
     let userid = req.query.userid;
-    pool.query('SELECT userid, placeid, insertdatetime as resultdate, name as placename, description, price, stars, location, places."imageUrl" FROM history JOIN places ON (history.placeid = places.id) WHERE userid = $1',[userid], (err, result)=>{
+    pool.query('SELECT userid, placeid, insertdatetime as resultdate, name as placename, description, price, stars, location, places."imageUrl" FROM history JOIN places ON (history.placeid = places.id) WHERE userid = $1 ORDER BY insertdatetime DESC',[userid], (err, result)=>{
         if(err){
             res.status(400).send('Error occured, parameter may be wrong.\nParameter expected: userid (it has to be valid).\nIf the problem persists then use another API :\)');
             console.log(err);
-        }
-        else{
-            res.status(200).send(result.rows);
+        } else {
+            res.status(200).send(result.rows.slice(0, 15));
             console.log(result.rows);
         }
     })
@@ -94,13 +93,9 @@ app.get('/history', (req,res)=>{
 
 // POST FAV
 app.post('/favorites', (req,res) =>{
-    //select userid placeid 
-        //if result.rows.lenght == 0 then insert
-        //else alter row
     const userid = req.body['userid'];
     const placeid = req.body['placeid'];
     const isfav = req.body['isfav'];
-    console.log(userid + '+' + placeid)
     pool.query('SELECT * FROM favorites WHERE userid = $1 AND placeid = $2', [userid, placeid], (err, result)=>{
         if(err){console.log(err); res.send('Errore post favorites (SELECT)')}
         else{
