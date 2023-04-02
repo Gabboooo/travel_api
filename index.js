@@ -119,6 +119,21 @@ app.post('/favorites', (req,res) =>{
     })
 })
 
+app.get('/favorites', (req,res)=>{
+    const userid = req.query.userid
+    const placeid = req.query.placeid
+    pool.query('SELECT * from favorites WHERE userid = $1 AND placeid = $2', [userid, placeid], (err, result)=>{
+        if(err){
+            console.log(err);
+            res.status(200).send('Error get favorites (SELECT)')
+        }
+        else{
+            if(result.rowCount == 1){ res.status(200).send(true)}
+            else{res.status(200).json(false)}
+        }
+    })
+})
+
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
   })
