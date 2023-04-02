@@ -21,12 +21,6 @@ app.use(express.urlencoded({
 }));
 app.use(express.json());
 
-
-// hash function, uses crypto
-function hash(string) {
-  return createHash('sha256').update(string).digest('hex');
-}
-
 // Postgre connection
 const pool = new Pool({
     user: process.env.PGUSER,
@@ -43,16 +37,24 @@ app.get('', (req, res)=>{
 })
 
 app.get('/places', (req, res)=>{
+    console.log('### GETTING PLACES ###')
     res.statusCode = 200;
     pool.query('SELECT * from places', (err,result)=>{
-        res.json(result.rows);
+        if(err){
+            console.log(err);
+            res.status(500).send('Error get places');
+        }
+        res.status(200).json(result.rows);
     })
 })
 
 app.get('/get_user', (req,res) =>{
+    console.log('### GETTING GET_USER ###');
     let email = req.query.email;
     pool.query('SELECT user_id FROM users WHERE user_mail = $1::text', [email], (err,result) =>{
-        if(result.rows.length == 0){
+        if(err){console.log(err); res.status(500).send('Error get get_users')}
+        else
+        {if(result.rows.length == 0){
             pool.query('INSERT INTO users (user_mail, user_id) VALUES ($1::text, DEFAULT)', [email], (err,result)=>{
                 pool.query('SELECT user_id FROM users WHERE user_mail = $1::text', [email], (err,result)=>{
                     res.json(result.rows[0]);
@@ -61,15 +63,16 @@ app.get('/get_user', (req,res) =>{
         }
         else{
             res.json(result.rows[0]);
-        }
+        }}
     })
 })
 
 app.post('/history', (req,res)=>{
+    console.log('### POSTING HISTORY ###')
     const body = req.body;
     pool.query('INSERT INTO history (userid, placeid) VALUES ($1, $2)', [body['userid'], body['placeid']],(err, result)=>{
         if(err){
-            res.status(400).send('Error occured, parameters may be wrong.\nParameters expected: userid, placeid (they have to be valid).\nIf the problem persists then use another API :\)');
+            res.status(500).send('Error post history');
             console.log(err);
         }
         else{
@@ -79,11 +82,12 @@ app.post('/history', (req,res)=>{
 })
 
 app.get('/history', (req,res)=>{
+    console.log('### GETTING HISTORY ###')
     let userid = req.query.userid;
     pool.query('SELECT userid, placeid, insertdatetime as resultdate, name as placename, description, price, stars, location, places."imageUrl" FROM history JOIN places ON (history.placeid = places.id) WHERE userid = $1 ORDER BY insertdatetime DESC',[userid], (err, result)=>{
         if(err){
-            res.status(400).send('Error occured, parameter may be wrong.\nParameter expected: userid (it has to be valid).\nIf the problem persists then use another API :\)');
             console.log(err);
+            res.status(500).send('Error get history');
         } else {
             res.status(200).send(result.rows.slice(0, 15));
             console.log(result.rows);
@@ -93,6 +97,7 @@ app.get('/history', (req,res)=>{
 
 // POST FAV
 app.post('/favorites', (req,res) =>{
+    console.log('### POSTING FAVORITES ###')
     const userid = req.body['userid'];
     const placeid = req.body['placeid'];
     const isfav = req.body['isfav'];
@@ -107,7 +112,7 @@ app.post('/favorites', (req,res) =>{
             }
             else if(result.rowCount == 0 && isfav){
                 pool.query('INSERT INTO favorites (userid, placeid) VALUES ($1, $2)', [userid, placeid], (err3, result3)=>{
-                    if(err3){console.log(err3); res.send('Errore post favorites (INSERT), invalid placeid or userid?')}
+                    if(err3){console.log(err3); res.send('Errore post favorites (INSERT)\nInvalid placeid or userid?')}
                     else{console.log('successful insert'); res.status(200).send('Fav inserted')}
                 })
             }
@@ -120,6 +125,7 @@ app.post('/favorites', (req,res) =>{
 })
 
 app.get('/favorites', (req,res)=>{
+    console.log('### GETTING FAVORITES ###')
     const userid = req.query.userid
     const placeid = req.query.placeid
     pool.query('SELECT * from favorites WHERE userid = $1 AND placeid = $2', [userid, placeid], (err, result)=>{

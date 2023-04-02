@@ -1,0 +1,22 @@
+:root{
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+}
+
+body{
+    margin-top: 3rem;
+    padding: 3em;
+    text-align: center;
+    background-color: darkcyan;
+}
+
+div{
+    margin-top: 4rem;
+}
+
+a{
+    color:black;
+}
+
+a:visited{
+    color:inherit;
+}
