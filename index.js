@@ -148,6 +148,9 @@ app.get('/all_favorites', (req,res)=>{
             res.status(500).send('Error get all_favorites (SELECT)')
         }
         else{
+            result.rows.forEach(row =>{
+                row['isfav'] = true;
+            })
             res.status(200).json(result.rows)
         }
     })
