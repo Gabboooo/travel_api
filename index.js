@@ -38,7 +38,6 @@ app.get('', (req, res)=>{
 
 app.get('/places', (req, res)=>{
     console.log('### GETTING PLACES ###')
-    res.statusCode = 200;
     pool.query('SELECT * from places', (err,result)=>{
         if(err){
             console.log(err);
@@ -57,12 +56,12 @@ app.get('/get_user', (req,res) =>{
         {if(result.rows.length == 0){
             pool.query('INSERT INTO users (user_mail, user_id) VALUES ($1::text, DEFAULT)', [email], (err,result)=>{
                 pool.query('SELECT user_id FROM users WHERE user_mail = $1::text', [email], (err,result)=>{
-                    res.json(result.rows[0]);
+                    res.status(200).json(result.rows[0]);
                 })
             })
         }
         else{
-            res.json(result.rows[0]);
+            res.status(200).json(result.rows[0]);
         }}
     })
 })
@@ -76,7 +75,7 @@ app.post('/history', (req,res)=>{
             console.log(err);
         }
         else{
-        res.status(201).send('Success');
+        res.status(200).send('Success');
         }
     })
 })
@@ -106,13 +105,13 @@ app.post('/favorites', (req,res) =>{
         else{
             if(result.rowCount>0 && !isfav){
                 pool.query('DELETE FROM favorites WHERE userid = $1  AND placeid = $2', [userid, placeid], (err2, result2)=>{
-                    if(err2){console.log(err2); res.send('Errore post favorites (DELETE)')}
+                    if(err2){console.log(err2); res.status(500).send('Errore post favorites (DELETE)')}
                     else{console.log('successful removal'); res.status(200).send('Fav removed')}
                 })
             }
             else if(result.rowCount == 0 && isfav){
                 pool.query('INSERT INTO favorites (userid, placeid) VALUES ($1, $2)', [userid, placeid], (err3, result3)=>{
-                    if(err3){console.log(err3); res.send('Errore post favorites (INSERT)\nInvalid placeid or userid?')}
+                    if(err3){console.log(err3); res.status(500).send('Errore post favorites (INSERT)\nInvalid placeid or userid?')}
                     else{console.log('successful insert'); res.status(200).send('Fav inserted')}
                 })
             }
@@ -131,11 +130,25 @@ app.get('/favorites', (req,res)=>{
     pool.query('SELECT * from favorites WHERE userid = $1 AND placeid = $2', [userid, placeid], (err, result)=>{
         if(err){
             console.log(err);
-            res.status(200).send('Error get favorites (SELECT)')
+            res.status(500).send('Error get favorites (SELECT)')
         }
         else{
             if(result.rowCount == 1){ res.status(200).send(true)}
             else{res.status(200).json(false)}
+        }
+    })
+})
+
+app.get('/all_favorites', (req,res)=>{
+    console.log('### GETTING ALL FAVORITES ###')
+    const userid = req.query.userid
+    pool.query('SELECT placeid from favorites WHERE userid = $1', [userid], (err, result)=>{
+        if(err){
+            console.log(err);
+            res.status(500).send('Error get all_favorites (SELECT)')
+        }
+        else{
+            res.status(200).json(result.rows)
         }
     })
 })
