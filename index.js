@@ -171,6 +171,20 @@ app.get('/placesbyactivity', (req, res)=>{
 })
 })
 
+app.delete('/history', (req,res)=>{
+    console.log('### DELETING HISTORY ###')
+    const userid = req.body['userid'];
+    pool.query('DELETE FROM history WHERE userid = $1', [userid], (err,result)=>{
+        if(err){res.status(500).send('Error deleting history')}
+        else{
+            res.status(200).send('Deleted successfully')
+        }
+    }
+    
+    )
+})
+
+
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
   })
