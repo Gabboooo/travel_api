@@ -168,20 +168,32 @@ app.get('/placesbyactivity', (req, res)=>{
             })
             res.status(200).json(Object.fromEntries(result));
         }
-})
+    })
 })
 
 app.delete('/history', (req,res)=>{
     console.log('### DELETING HISTORY ###')
     const userid = req.body['userid'];
-    pool.query('DELETE FROM history WHERE userid = $1', [userid], (err,result)=>{
+    const placeid = req.body['placeid']
+    let query;
+    let qargs;
+    if(!placeid){ 
+        query = 'DELETE FROM history WHERE userid = $1';
+        qargs = [userid];
+        console.log('no placeid given')
+    }
+    else{ 
+        query = 'DELETE FROM history WHERE userid = $1 and placeid = $2'
+        qargs = [userid, placeid];
+        console.log('placeid given')
+    }
+
+    pool.query(query, qargs, (err,result)=>{
         if(err){res.status(500).send('Error deleting history')}
         else{
             res.status(200).send('Deleted successfully')
         }
-    }
-    
-    )
+    })
 })
 
 
