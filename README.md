@@ -15,8 +15,6 @@ To run this project, you will need to add the following environment variables to
 `PGPORT`
 
 
-
-
 ## Documentation
 
 [Express](https://expressjs.com)\
@@ -32,12 +30,16 @@ This API **has not** any kind of authentication or security layer, wich is out o
 **GET REQUESTS**
 
 - `/places` : returns all the places in database (as json)
+- `/placesbyactivity` : returns an object having as fields all the different activities, each of these field corresponds to an array of all the places having that activity (as json)
 - `/get_user?email=...` : returns the user id corresponding to the given email, if the email is not found in the database, generates a new entry in the database (email, id) and returns the generated id (as json)
 - `/history?userid=...` : returns the last 15 results of the user survey history (as json), sorted by date of insertion
 - `/favorites?userid=...&placeid=...` : returns a boolean indicating if that placeid is favorite for the specific userid
-- `/all_favorites?userid=...` : returns a list of objects, each containig a field 'placeid' with the id of one favorite place
+- `/all_favorites?userid=...` : returns a list of objects, each containig a field **placeid** with the id of one favorite place
 
 **POST REQUESTS**
 All of the following post methods takes a body for the request to work.
 - `/history` : takes a body with fields **userid** and **placeid**. The request inserts a new entry in the database with the current timestamp (userid, placeid, timestamp).
 - `/favorites`  takes a body with fields **userid**, **placeid** and **isfav**. Changes the favorite state of the specific place for the specific user.
+
+**DELETE REQUESTS**
+- `/history` : takes a body with the **userid** field, and deletes the entire history regarding the specific user
