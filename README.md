@@ -42,4 +42,5 @@ All of the following post methods takes a body for the request to work.
 - `/favorites`  takes a body with fields **userid**, **placeid** and **isfav**. Changes the favorite state of the specific place for the specific user.
 
 **DELETE REQUESTS**
-- `/history` : takes a body with the **userid** field, and deletes the entire history regarding the specific user
+- `/history` : takes a body with the **serial** field of the specific history entry, and deletes the single history intended
+- `/alhistory` : takes a body with the **userid** field, and deletes the entire history of the specified user
