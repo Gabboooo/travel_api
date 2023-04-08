@@ -82,7 +82,7 @@ app.post('/history', (req,res)=>{
 app.get('/history', (req,res)=>{
     console.log('### GETTING HISTORY ###')
     let userid = req.query.userid;
-    pool.query('SELECT userid, placeid, insertdatetime as resultdate, name as placename, description, price, stars, location, places."imageUrl" FROM history JOIN places ON (history.placeid = places.id) WHERE userid = $1 ORDER BY insertdatetime DESC',[userid], (err, result)=>{
+    pool.query('SELECT userid, placeid, insertdatetime as resultdate, serial, name as placename, description, price, stars, location, places."imageUrl" FROM history JOIN places ON (history.placeid = places.id) WHERE userid = $1 ORDER BY insertdatetime DESC',[userid], (err, result)=>{
         if(err){
             res.status(500).send('Error get history');
         } else {
@@ -172,28 +172,31 @@ app.get('/placesbyactivity', (req, res)=>{
 })
 
 app.delete('/history', (req,res)=>{
-    console.log('### DELETING HISTORY ###')
-    const userid = req.body['userid'];
-    const placeid = req.body['placeid']
-    let query;
-    let qargs;
-    if(!placeid){ 
-        query = 'DELETE FROM history WHERE userid = $1';
-        qargs = [userid];
-        console.log('no placeid given')
-    }
-    else{ 
-        query = 'DELETE FROM history WHERE userid = $1 and placeid = $2'
-        qargs = [userid, placeid];
-        console.log('placeid given')
-    }
-
-    pool.query(query, qargs, (err,result)=>{
-        if(err){res.status(500).send('Error deleting history')}
+    console.log('### DELETING HISTORY BY SERIAL ###')
+    const serial = req.body['serial'];
+    const query = 'DELETE FROM history WHERE serial = $1';
+    pool.query(query, [serial], (err, result) =>{
+        if(err){
+            res.status(500).send('Error deleting history by serial');
+        }
         else{
             res.status(200).send('Deleted successfully')
         }
-    })
+    });
+})
+
+app.delete('/allhistory', (req,res)=>{
+    console.log('### DELETING ALL HISTORY###')
+    const userid = req.body['userid'];
+    const query = 'DELETE FROM history WHERE userid = $1';
+    pool.query(query, [userid], (err, result) =>{
+        if(err){
+            res.status(500).send('Error deleting all history');
+        }
+        else{
+            res.status(200).send('Deleted successfully')
+        }
+    });
 })
 
 
