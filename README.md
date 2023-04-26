@@ -23,7 +23,7 @@ To run this project, you will need to add the following environment variables to
 
 
 ## Features
-This API **has not** any kind of authentication or security layer, wich is out of scope for this project
+This API **has not** any kind of authentication or security layer, which is out of scope for this project
 
 ### Implemented routes
 
